@@ -1,0 +1,1 @@
+# build parser_test.c as entry and parse_asm.c
