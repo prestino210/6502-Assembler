@@ -5,6 +5,7 @@ typedef enum {
     REGISTER,
     INT_LITERAL,
     ADDRESS,
+    DIRECTIVE,
     SHORT_HAND, // Mnemonics and labels
     LABEL,
     COMMENT,
@@ -13,8 +14,7 @@ typedef enum {
 
 typedef struct {
     TOKEN_TYPE type;
-    char* str;
-    int value;
+    char* value;
 } Token;
 
 typedef struct {

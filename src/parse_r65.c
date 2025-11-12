@@ -33,13 +33,13 @@ Opcode_info get_opcode(Statement statement, uint16_t offset) { // if null return
     Token maj_token = tokens[0];
     switch(maj_token.type) {
         case SHORT_HAND:
-            instruction = maj_token.str;
+            instruction = maj_token.value;
             optypes_c[3]++;
             break;
         case LABEL:
             labelsc++;
             labels = realloc(labels, labelsc * sizeof(Label));
-            labels[labelsc - 1].label = tokens[0].str;
+            labels[labelsc - 1].label = tokens[0].value;
             optypes_c[4]++;
             break;
         default:

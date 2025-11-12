@@ -18,7 +18,7 @@ Statement* tokenize(char* contents) {
     int i = 0;
 
     while(contents[i] != '\0') {
-        if(str_is_statement && (contents[i] == '\t' || contents[i] == ':')) { 
+        if(str_is_statement && (contents[i] == '\t')) { 
             str_statementsc++;
             str_statements = realloc(str_statements, str_statementsc * sizeof(char*));
             char* buf = NULL;
@@ -63,8 +63,8 @@ Statement* tokenize(char* contents) {
         char c = str_statements[i][j];
         while(c != '\0') {
             Token token = {0};
-            token.str = malloc(sizeof(char));
-            token.str[0] = '\0';
+            token.value = malloc(sizeof(char));
+            token.value[0] = '\0';
             token.type = EXCLUDE;
             c = str_statements[i][j];
             if(c == '_' || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
@@ -111,27 +111,21 @@ Statement* tokenize(char* contents) {
                         }
                         break;
                 }
-                token.str = str;
+                token.value = str;
             } else if(c == '#' || c == '$') {
                 bool is_addr = ((c == '$') ? true : false);
                 char* str = NULL;
-                char* int_buf = NULL;
                 int k = 0;
                 char _c = str_statements[i][j];
                 
-                while(!(_c == '\0' || _c == ' ' || _c == ':' || _c == ',')) {
+                while(!(_c == ')' || _c == '\0' || _c == ' ' || _c == ':' || _c == ',')) {
                     if(!is_addr & k == 1 && _c != '$') {
                         printf("Invalid syntax.\n");
                         return NULL;
                     }
-                    if(!is_addr & ((_c >= 'A' && _c <= 'Z') || (_c >= 'a' && _c <= 'z'))) {
-                        if(k == 2) {
-                            printf("Invalid integer.\n");
-                            return NULL;
-                        } else if(k > 2) {
-                            printf("Missing space.\n");
-                            return NULL;
-                        }
+                    if(k > 1 && !is_addr & !((_c >= 'A' && _c <= 'Z') || (_c >= 'a' && c <= 'z') || (_c >= '0' && _c <= '9'))) {
+                        printf("Invalid integer.\n");
+                        return NULL;
                     }
                     if(k > 0 && is_addr & !((_c >= 'A' && _c <= 'Z') || (_c >= 'a' && c <= 'z') || (_c >= '0' && _c <= '9'))) {
                         printf("Invalid address.\n");
@@ -141,26 +135,24 @@ Statement* tokenize(char* contents) {
                     k++; j++;
                     str = realloc(str, k * sizeof(char));
                     str[k - 1] = _c;
-                    if(!is_addr && k > 2)  {
-                        int_buf = realloc(int_buf, (k - 2) * sizeof(char));
-                        int_buf[k - 3] = _c;
-                    }
                     _c = str_statements[i][j];
                 }
                 str = realloc(str, (k + 1) * sizeof(char));
                 str[k] = '\0';
-                if(!is_addr) {
-                    int_buf = realloc(int_buf, (k - 1) * sizeof(char));
-                    int_buf[k - 2] = '\0';
-                }
-                switch(is_addr) {
+    
+                switch(is_addr) { // remove the int buf since in writing it will all be hex strings converting into raw data
                     case false:
-                        token.type = INT_LITERAL;
-                        token.value = atoi(int_buf);
+                        if(k > 2) {
+                            token.type = INT_LITERAL;
+                            token.value = str;
+                        } else {
+                            printf("Invalid integer.\n");
+                            return NULL;
+                        }
                         break;
                     case true:
                         token.type = ADDRESS;
-                        token.str = str;
+                        token.value = str;
                         break;
                 }
 
@@ -175,12 +167,46 @@ Statement* tokenize(char* contents) {
                     str = realloc(str, k * sizeof(char));
                     str[k - 1] = _c;
                     _c = str_statements[i][j];
-                    if(_c == '\0') break;
                 }
                 str = realloc(str, (k + 1) * sizeof(char));
                 str[k] = '\0';
                 token.type = COMMENT;
-                token.str = str;
+                token.value = str;
+            } else if(c == '.') {
+                int k = 0;
+                char* str = NULL;
+                char _c = str_statements[i][j];
+                while(!(_c == ' ' || _c == ':' || _c == ',' || _c == '\0')) {
+                    if(k > 0 && (!(_c == '_' || (_c >= '0' && _c <= '9') || (_c >= 'a' && _c <= 'z') || (_c >= 'A' && _c <= 'Z')))) {
+                        printf("Missing space.\n");
+                        return NULL;
+                    }
+
+                    k++; j++;
+                    str = realloc(str, k * sizeof(char));
+                    str[k - 1] = _c;
+                    _c = str_statements[i][j];
+                    if(_c == '\0') break;
+                }
+                str = realloc(str, (k + 1) * sizeof(char));
+                str[k] = '\0';
+                switch(_c) {
+                    case ',':
+                        printf("Invalid directive.\n");
+                        return NULL;
+                        //error
+                        break;
+                    case ':':
+                        // error
+                        printf("Invalid directive.\n");
+                        return NULL;
+                        break;
+                    default:
+                        token.type = DIRECTIVE;
+                        token.value = str;
+                        break;
+                }
+                
             } else {
                 token.type = EXCLUDE;
                 j++;
@@ -195,31 +221,39 @@ Statement* tokenize(char* contents) {
         }
     }
 
-    printf("Tokens:\n");
+    printf("Tokens by line:\n");
     for(int i = 0; i < statementsc; i++) {
+        printf("Line %d: ", i+1);
         for(int j = 0; j < statements[i].tokensc; j++) {
-            printf("[%d, \"%s\", ", statements[i].tokens[j].value, statements[i].tokens[j].str);
+            
             switch(statements[i].tokens[j].type) {
                 case REGISTER:
-                    printf("Register] ");
+                    printf("[Register: ");
+                    break;
+                case DIRECTIVE:
+                    printf("[Directive: ");
                     break;
                 case INT_LITERAL:
-                    printf("Int literal] ");
+                    printf("[Int literal: ");
                     break;
                 case ADDRESS:
-                    printf("Address] ");
+                    printf("[Address: ");
                     break;
                 case SHORT_HAND:
-                    printf("Short hand] ");
+                    printf("[Short hand: ");
                     break;
                 case COMMENT:
-                    printf("Comment] ");
+                    printf("[Comment: ");
                     break;
                 case LABEL:
-                    printf("Label] ");
+                    printf("[Label: ");
                     break;
             }
-         
+            if(j == statements[i].tokensc -1) {
+                printf("%s]", statements[i].tokens[j].value);
+            } else {
+                printf("%s], ", statements[i].tokens[j].value);
+            }
         }
         printf("\n");
     }
