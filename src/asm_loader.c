@@ -21,16 +21,16 @@ char* get_contents(char* r65asm_path) {
     int line_count = 0;
     
     while ((line_chars = getline(&_line_buf, &line_buf_size, file)) != -1) {
-        
         if(_line_buf[line_chars - 1] == '\n') line_chars--;
-
+        line_chars++;
         line_buf = malloc(line_chars * sizeof(char));
-        for(int i = 0; i < line_chars; i++) {
+        for(int i = 0; i < line_chars - 1; i++) {
             line_buf[i] = _line_buf[i];
         }
+        line_buf[line_chars - 1] = '\t';
 
         if(line_count == 0) {
-            if(strcmp(line_buf, "__R65A__") != 0) {
+            if(strcmp(line_buf, "__R65A__\t") != 0) {
                 printf("Missing __R65A__ header.\n");
                 return NULL;
             }
