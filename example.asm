@@ -1,5 +1,5 @@
 __R65A__
-test_label:
-LDA $00     ; test comments
-LDA $0000
-LDA #$50
+test_label123:
+LDA $FF     ; test comment
+LDA $00FF
+LDA #$55

@@ -67,12 +67,12 @@ Statement* tokenize(char* contents) {
             token.str[0] = '\0';
             token.type = EXCLUDE;
             c = str_statements[i][j];
-            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+            if(c == '_' || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
                 int k = 0;
                 char* str = NULL;
                 char _c = str_statements[i][j];
                 while(!(_c == ' ' || _c == ':' || _c == ',' || _c == '\0')) {
-                    if(!(((_c >= 'a') && (_c <= 'z')) || ((_c >= 'A') && (_c <= 'Z')))) {
+                    if(!(_c == '_' || (_c >= '0' && _c <= '9') || (_c >= 'a' && _c <= 'z') || (_c >= 'A' && _c <= 'Z'))) {
                         printf("Missing space.\n");
                         return NULL;
                     }
@@ -125,14 +125,17 @@ Statement* tokenize(char* contents) {
                         return NULL;
                     }
                     if(!is_addr & ((_c >= 'A' && _c <= 'Z') || (_c >= 'a' && _c <= 'z'))) {
-                        if(k == 3) {
+                        if(k == 2) {
                             printf("Invalid integer.\n");
                             return NULL;
-                        } else {
+                        } else if(k > 2) {
                             printf("Missing space.\n");
                             return NULL;
                         }
-                        
+                    }
+                    if(k > 0 && is_addr & !((_c >= 'A' && _c <= 'Z') || (_c >= 'a' && c <= 'z') || (_c >= '0' && _c <= '9'))) {
+                        printf("Invalid address.\n");
+                        return NULL;
                     }
                     
                     k++; j++;
@@ -152,6 +155,7 @@ Statement* tokenize(char* contents) {
                 }
                 switch(is_addr) {
                     case false:
+                        token.type = INT_LITERAL;
                         token.value = atoi(int_buf);
                         break;
                     case true:
