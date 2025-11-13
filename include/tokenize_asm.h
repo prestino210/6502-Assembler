@@ -6,7 +6,7 @@ typedef enum {
     INT_LITERAL,
     ADDRESS,
     DIRECTIVE,
-    SHORT_HAND, // Mnemonics and labels
+    INSTRUCTION,
     LABEL,
     COMMENT,
     EXCLUDE

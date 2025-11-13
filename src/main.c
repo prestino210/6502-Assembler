@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+// @todo: tell user the line and character in errors
 int main(int argc, char** argv) {
     if(argc > 1) {
         char* contents = get_contents(argv[1]);

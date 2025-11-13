@@ -88,14 +88,14 @@ Statement* tokenize(char* contents) {
                 switch(_c) {
                     case ',':
                         if(k > 1) {
-                            token.type = SHORT_HAND;
+                            token.type = INSTRUCTIOn;
                         } else {
                             token.type = REGISTER;
                         }
                         break;
                     case ' ':
                         if(k > 1) {
-                            token.type = SHORT_HAND;
+                            token.type = INSTRUCTION;
                         } else {
                             token.type = REGISTER;
                         }
@@ -105,7 +105,7 @@ Statement* tokenize(char* contents) {
                         break;
                     case '\0':
                         if(k > 1) {
-                            token.type = SHORT_HAND;
+                            token.type = INSTRUCTION;
                         } else {
                             token.type = REGISTER;
                         }
@@ -239,8 +239,8 @@ Statement* tokenize(char* contents) {
                 case ADDRESS:
                     printf("[Address: ");
                     break;
-                case SHORT_HAND:
-                    printf("[Short hand: ");
+                case INSTRUCTION:
+                    printf("[Instruction: ");
                     break;
                 case COMMENT:
                     printf("[Comment: ");

@@ -4,7 +4,7 @@
 #include "tokenize_asm.h"
 
 typedef struct {
-    int opcode;
+    uint8_t* opcode;
     int bytes;
 } Opcode_info;
 
