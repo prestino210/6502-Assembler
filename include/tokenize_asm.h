@@ -3,13 +3,15 @@
 
 typedef enum {
     REGISTER,
+    SYMBOL,
     INT_LITERAL,
     ADDRESS,
     DIRECTIVE,
+    DIRECTIVE_LABEL,
     INSTRUCTION,
     LABEL,
     COMMENT,
-    EXCLUDE
+    INVALID
 } TOKEN_TYPE;
 
 typedef struct {

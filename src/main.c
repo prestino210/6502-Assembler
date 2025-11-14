@@ -18,8 +18,27 @@ int main(int argc, char** argv) {
         goto catch;
     }
     Token* tokens = tokenize(contents);
+    Token token;
+    int i = 0;
+    while((token = tokens[i]).type != NULL) {
+        i++;
+        char* token_type;
+        switch(token.type) {
+            case DIRECTIVE_LABEL: token_type = "Directive label"; break;
+            case REGISTER: token_type = "Register"; break;
+            case INT_LITERAL: token_type = "Int literal"; break;
+            case ADDRESS: token_type = "Address"; break;
+            case DIRECTIVE: token_type = "Directive"; break;
+            case INSTRUCTION: token_type = "Instruction"; break;
+            case LABEL: token_type = "Label"; break;
+            case COMMENT: token_type = "Comment"; break;
+        }
+        printf("[%s, %s]\n", token_type, token.value);
+    }
+
+
     if(tokens == NULL) {
-        printf("Analysis error.\n"); // un comment
+        printf("Analysis error.\n"); 
         goto catch;
     }
     uint8_t* rom_bytes = parse_6502(tokens);

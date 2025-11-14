@@ -10,6 +10,10 @@ bool check_sig(char* str_buf) {
     return strcmp(str_buf, SIGNATURE_6502) == 0;
 }
 
+bool check_n(char* str_buf, int chars) {
+    return str_buf[chars - 1] == '\n';
+}
+
 char* get_contents(char* asm6502_path) {
     
     char* contents_buf = NULL;
@@ -29,24 +33,26 @@ char* get_contents(char* asm6502_path) {
     
     while ((line_chars = getline(&line_buf, &line_buf_size, file)) != -1) {
         lines++;
-        if(line_buf[line_chars - 1] == '\n') {
-            line_buf[line_chars - 1] = (lines > 0) ? ' ' : '\0';
-        } else {
-            if(lines == 0) goto check_sig;
-            line_chars++;
-            line_buf_size = line_chars * sizeof(char);
-            line_buf = realloc(line_buf, line_buf_size);
-            line_buf[line_chars - 1] = ' ';
-        }
-        check_sig:
-        if(lines == 0 && !check_sig(line_buf)) {
-            break;
-        }
-        buf_chars += line_chars;
-        buf_size = buf_chars * sizeof(char);
-        contents_buf = realloc(contents_buf, buf_size);
-        for(int i = 0; i < line_chars; i++) {
-            contents_buf[buf_chars - line_chars + i] = line_buf[i];
+        if(lines == 0) {
+            if(check_n(line_buf, line_chars))  { 
+                line_buf[line_chars - 1] = '\0';
+                line_chars--; 
+            }
+            if(!check_sig(line_buf)) break;
+        } else if(lines > 0) {
+            if(!check_n(line_buf, buf_chars)) {
+                line_chars++;
+                line_buf_size = line_chars * sizeof(char);
+                line_buf = realloc(line_buf, line_buf_size);
+                line_buf[line_chars - 1] = '\n';
+            }
+        
+            buf_chars += line_chars;
+            buf_size = buf_chars * sizeof(char);
+            contents_buf = realloc(contents_buf, buf_size);
+            for(int i = 0; i < line_chars; i++) {
+                contents_buf[buf_chars - line_chars + i] = line_buf[i];
+            }
         }
     }
 
