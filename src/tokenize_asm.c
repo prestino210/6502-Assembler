@@ -58,12 +58,12 @@ Token* tokenize(char* contents) {
             switch(c) {
                 case '\n': line++; col = 1; break;
                 case ':': 
-                    if(type != DIRECTIVE){
-                        type = LABEL; 
+                    if(type == SYMBOL || type == DIRECTIVE) {
+                        type == LABEL;
                     } else {
-                        type = DIRECTIVE_LABEL; 
+                        goto fail;
                     }
-                break;
+                    break;
             }
 
             if(type == SYMBOL) {

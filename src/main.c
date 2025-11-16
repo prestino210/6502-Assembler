@@ -24,7 +24,6 @@ int main(int argc, char** argv) {
         i++;
         char* token_type;
         switch(token.type) {
-            case DIRECTIVE_LABEL: token_type = "Directive label"; break;
             case REGISTER: token_type = "Register"; break;
             case INT_LITERAL: token_type = "Int literal"; break;
             case ADDRESS: token_type = "Address"; break;
